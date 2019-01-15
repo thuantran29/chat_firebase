@@ -4,7 +4,6 @@ import 'package:chat_firebase/ui/login_screen.dart';
 import 'package:flutter/material.dart';
 
 class RootPage extends StatefulWidget {
-
   @override
   State<StatefulWidget> createState() => _RootPageState();
 }
@@ -17,11 +16,12 @@ enum AuthStatus {
 
 class _RootPageState extends State<RootPage> {
   AuthStatus authStatus = AuthStatus.notDetermined;
-
+  String userId = "";
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     var auth = AuthProvider.of(context).auth;
+    userId = auth.currentUser() as String;
     auth.currentUser().then((userId) {
       setState(() {
         authStatus =
@@ -53,7 +53,7 @@ class _RootPageState extends State<RootPage> {
         );
       case AuthStatus.signedIn:
         return HomePage(
-          onSignedOut: _signedOut,
+          currentUserId: userId,onSignedOut: _signedOut,
         );
     }
     return null;
