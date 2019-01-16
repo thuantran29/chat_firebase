@@ -16,13 +16,13 @@ enum AuthStatus {
 
 class _RootPageState extends State<RootPage> {
   AuthStatus authStatus = AuthStatus.notDetermined;
-  String userId = "";
+  String userLoginId = "";
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     var auth = AuthProvider.of(context).auth;
-    userId = auth.currentUser() as String;
     auth.currentUser().then((userId) {
+      userLoginId = userId;
       setState(() {
         authStatus =
         userId == null ? AuthStatus.notSignedIn : AuthStatus.signedIn;
@@ -53,7 +53,7 @@ class _RootPageState extends State<RootPage> {
         );
       case AuthStatus.signedIn:
         return HomePage(
-          currentUserId: userId,onSignedOut: _signedOut,
+          currentUserId: userLoginId,onSignedOut: _signedOut,
         );
     }
     return null;

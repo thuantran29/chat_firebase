@@ -1,7 +1,9 @@
 import 'package:chat_firebase/firebase/auth_provider.dart';
 import 'package:chat_firebase/ui/register_screen.dart';
 import 'package:chat_firebase/views/stacked_icons.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class EmailFieldValidator {
   static String validate(String value) {
@@ -26,7 +28,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final formKey = GlobalKey<FormState>();
-
+  SharedPreferences prefs;
   String _email;
   String _password;
 
@@ -40,6 +42,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void validateAndSubmit() async {
+    prefs = await SharedPreferences.getInstance();
     if (validateAndSave()) {
       try {
         var auth = AuthProvider.of(context).auth;
@@ -47,7 +50,12 @@ class _LoginPageState extends State<LoginPage> {
         String userId =
             await auth.signInWithEmailAndPassword(_email, _password);
         print('Signed in: $userId');
-
+        final QuerySnapshot result = await Firestore.instance.collection('users').where('id', isEqualTo: userId).getDocuments();
+        final List<DocumentSnapshot> documents = result.documents;
+        await prefs.setString('id', documents[0]['id']);
+        await prefs.setString('nickname', documents[0]['nickname']);
+        await prefs.setString('photoUrl', documents[0]['photoUrl']);
+        await prefs.setString('aboutMe', documents[0]['aboutMe']);
         widget.onSignedIn();
       } catch (e) {
         print('Error: $e');
