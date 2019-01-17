@@ -14,20 +14,24 @@ import 'package:shared_preferences/shared_preferences.dart';
 class Chat extends StatelessWidget {
   final String peerId;
   final String peerAvatar;
+  final String peerName;
 
-  Chat({Key key, @required this.peerId, @required this.peerAvatar}) : super(key: key);
+  Chat({Key key, @required this.peerName, @required this.peerId, @required this.peerAvatar}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: new AppBar(
         title: new Text(
-          'CHAT',
+          peerName,
           style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
       ),
-
+      body: new ChatScreen(
+        peerId: peerId,
+        peerAvatar: peerAvatar,
+      ),
     );
   }
 }

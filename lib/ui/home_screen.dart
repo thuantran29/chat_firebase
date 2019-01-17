@@ -181,6 +181,7 @@ class HomePageState extends State<HomePage> {
                     builder: (context) => Chat(
                       peerId: document.documentID,
                       peerAvatar: document['photoUrl'],
+                      peerName: document['nickname'],
                     )));
           },
           color: greyColor2,
