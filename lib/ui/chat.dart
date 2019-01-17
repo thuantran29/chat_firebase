@@ -206,7 +206,7 @@ class ChatScreenState extends State<ChatScreen> {
                 ),
                 errorWidget: Material(
                   child: Image.asset(
-                    'images/img_not_available.jpeg',
+                    'assets/img_not_available.jpeg',
                     width: 200.0,
                     height: 200.0,
                     fit: BoxFit.cover,
@@ -300,7 +300,7 @@ class ChatScreenState extends State<ChatScreen> {
                       ),
                       errorWidget: Material(
                         child: Image.asset(
-                          'images/img_not_available.jpeg',
+                          'assets/img_not_available.jpeg',
                           width: 200.0,
                           height: 200.0,
                           fit: BoxFit.cover,
@@ -414,7 +414,7 @@ class ChatScreenState extends State<ChatScreen> {
               FlatButton(
                 onPressed: () => onSendMessage('mimi1', 2),
                 child: new Image.asset(
-                  'images/mimi1.gif',
+                  'assets/mimi1.gif',
                   width: 50.0,
                   height: 50.0,
                   fit: BoxFit.cover,
@@ -423,7 +423,7 @@ class ChatScreenState extends State<ChatScreen> {
               FlatButton(
                 onPressed: () => onSendMessage('mimi2', 2),
                 child: new Image.asset(
-                  'images/mimi2.gif',
+                  'assets/mimi2.gif',
                   width: 50.0,
                   height: 50.0,
                   fit: BoxFit.cover,
@@ -432,7 +432,7 @@ class ChatScreenState extends State<ChatScreen> {
               FlatButton(
                 onPressed: () => onSendMessage('mimi3', 2),
                 child: new Image.asset(
-                  'images/mimi3.gif',
+                  'assets/mimi3.gif',
                   width: 50.0,
                   height: 50.0,
                   fit: BoxFit.cover,
@@ -446,7 +446,7 @@ class ChatScreenState extends State<ChatScreen> {
               FlatButton(
                 onPressed: () => onSendMessage('mimi4', 2),
                 child: new Image.asset(
-                  'images/mimi4.gif',
+                  'assets/mimi4.gif',
                   width: 50.0,
                   height: 50.0,
                   fit: BoxFit.cover,
@@ -455,7 +455,7 @@ class ChatScreenState extends State<ChatScreen> {
               FlatButton(
                 onPressed: () => onSendMessage('mimi5', 2),
                 child: new Image.asset(
-                  'images/mimi5.gif',
+                  'assets/mimi5.gif',
                   width: 50.0,
                   height: 50.0,
                   fit: BoxFit.cover,
@@ -464,7 +464,7 @@ class ChatScreenState extends State<ChatScreen> {
               FlatButton(
                 onPressed: () => onSendMessage('mimi6', 2),
                 child: new Image.asset(
-                  'images/mimi6.gif',
+                  'assets/mimi6.gif',
                   width: 50.0,
                   height: 50.0,
                   fit: BoxFit.cover,
@@ -478,7 +478,7 @@ class ChatScreenState extends State<ChatScreen> {
               FlatButton(
                 onPressed: () => onSendMessage('mimi7', 2),
                 child: new Image.asset(
-                  'images/mimi7.gif',
+                  'assets/mimi7.gif',
                   width: 50.0,
                   height: 50.0,
                   fit: BoxFit.cover,
@@ -487,7 +487,7 @@ class ChatScreenState extends State<ChatScreen> {
               FlatButton(
                 onPressed: () => onSendMessage('mimi8', 2),
                 child: new Image.asset(
-                  'images/mimi8.gif',
+                  'assets/mimi8.gif',
                   width: 50.0,
                   height: 50.0,
                   fit: BoxFit.cover,
@@ -496,7 +496,7 @@ class ChatScreenState extends State<ChatScreen> {
               FlatButton(
                 onPressed: () => onSendMessage('mimi9', 2),
                 child: new Image.asset(
-                  'images/mimi9.gif',
+                  'assets/mimi9.gif',
                   width: 50.0,
                   height: 50.0,
                   fit: BoxFit.cover,
