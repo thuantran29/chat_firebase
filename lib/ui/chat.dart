@@ -229,7 +229,7 @@ class ChatScreenState extends State<ChatScreen> {
           // Sticker
               : Container(
             child: new Image.asset(
-              'images/${document['content']}.gif',
+              'assets/${document['content']}.gif',
               width: 100.0,
               height: 100.0,
               fit: BoxFit.cover,
@@ -322,7 +322,7 @@ class ChatScreenState extends State<ChatScreen> {
                 )
                     : Container(
                   child: new Image.asset(
-                    'images/${document['content']}.gif',
+                    'assets/${document['content']}.gif',
                     width: 100.0,
                     height: 100.0,
                     fit: BoxFit.cover,
