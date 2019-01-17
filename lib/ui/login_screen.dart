@@ -1,5 +1,6 @@
 import 'package:chat_firebase/firebase/auth_provider.dart';
 import 'package:chat_firebase/ui/register_screen.dart';
+import 'package:chat_firebase/utils/conts.dart';
 import 'package:chat_firebase/views/stacked_icons.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -31,6 +32,13 @@ class _LoginPageState extends State<LoginPage> {
   SharedPreferences prefs;
   String _email;
   String _password;
+  bool isLoading;
+
+  @override
+  void initState() {
+    super.initState();
+    isLoading = false;
+  }
 
   bool validateAndSave() {
     final form = formKey.currentState;
@@ -46,20 +54,35 @@ class _LoginPageState extends State<LoginPage> {
     if (validateAndSave()) {
       try {
         var auth = AuthProvider.of(context).auth;
-
+        setState(() {
+          isLoading = true;
+        });
         String userId =
             await auth.signInWithEmailAndPassword(_email, _password);
         print('Signed in: $userId');
-        final QuerySnapshot result = await Firestore.instance.collection('users').where('id', isEqualTo: userId).getDocuments();
+        final QuerySnapshot result = await Firestore.instance
+            .collection('users')
+            .where('id', isEqualTo: userId)
+            .getDocuments();
         final List<DocumentSnapshot> documents = result.documents;
         await prefs.setString('id', documents[0]['id']);
         await prefs.setString('nickname', documents[0]['nickname']);
         await prefs.setString('photoUrl', documents[0]['photoUrl']);
         await prefs.setString('aboutMe', documents[0]['aboutMe']);
+        setState(() {
+          isLoading = false;
+        });
         widget.onSignedIn();
       } catch (e) {
         print('Error: $e');
+        setState(() {
+          isLoading = false;
+        });
       }
+    } else {
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -75,21 +98,28 @@ class _LoginPageState extends State<LoginPage> {
         appBar: AppBar(
           title: Text('Chat'),
         ),
-        body: SingleChildScrollView(
-          child: Column(
+        body: Center(
+          child: Stack(
             children: <Widget>[
-              new SizedBox(height: 20),
-              new StakedIcons(),
-              new Container(
-                margin: new EdgeInsets.only(left: 20, right: 20),
-                child: Form(
-                  key: formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: buildInputs() + buildSubmitButtons(),
-                  ),
+              SingleChildScrollView(
+                child: Column(
+                  children: <Widget>[
+                    SizedBox(height: 20),
+                    StakedIcons(),
+                    Container(
+                      margin: new EdgeInsets.only(left: 20, right: 20),
+                      child: Form(
+                        key: formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: buildInputs() + buildSubmitButtons(),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
+              buildLoading(),
             ],
           ),
         ));
@@ -125,5 +155,19 @@ class _LoginPageState extends State<LoginPage> {
         onPressed: moveToRegister,
       ),
     ];
+  }
+
+  Widget buildLoading() {
+    return Positioned(
+      child: isLoading
+          ? Container(
+              child: Center(
+                child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(themeColor)),
+              ),
+              color: Colors.white.withOpacity(0.8),
+            )
+          : Container(),
+    );
   }
 }
