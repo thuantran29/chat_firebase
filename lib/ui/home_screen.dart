@@ -17,23 +17,49 @@ class HomePage extends StatefulWidget {
   HomePage({Key key, this.currentUserId, this.onSignedOut}) : super(key: key);
 
   @override
-  State createState() => HomePageState(currentUserId: currentUserId);
+  HomePageState createState() =>  HomePageState(currentUserId: currentUserId);
+
 }
 
 class HomePageState extends State<HomePage> {
-  HomePageState({Key key, @required this.currentUserId});
+  HomePageState({Key key, @required this.currentUserId}) {
+    _SearchListState();
+  }
 
   final String currentUserId;
-
+  List filteredNames = new List();
   bool isLoading = false;
   List<Choice> choices = const <Choice>[
     const Choice(title: 'Settings', icon: Icons.settings),
     const Choice(title: 'Log out', icon: Icons.exit_to_app),
   ];
 
+  _SearchListState() {
+    _searchQuery.addListener(() {
+      if (_searchQuery.text.isEmpty) {
+        setState(() {
+          _IsSearching = false;
+          _searchText = "";
+        });
+      }
+      else {
+        setState(() {
+          _IsSearching = true;
+          _searchText = _searchQuery.text;
+        });
+      }
+    });
+  }
+
   Future<bool> onBackPress() {
     openDialog();
     return Future.value(false);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _IsSearching = false;
   }
 
   Future<Null> openDialog() async {
@@ -41,7 +67,8 @@ class HomePageState extends State<HomePage> {
         context: context,
         builder: (BuildContext context) {
           return SimpleDialog(
-            contentPadding: EdgeInsets.only(left: 0.0, right: 0.0, top: 0.0, bottom: 0.0),
+            contentPadding:
+                EdgeInsets.only(left: 0.0, right: 0.0, top: 0.0, bottom: 0.0),
             children: <Widget>[
               Container(
                 color: themeColor,
@@ -60,7 +87,10 @@ class HomePageState extends State<HomePage> {
                     ),
                     Text(
                       'Exit app',
-                      style: TextStyle(color: Colors.white, fontSize: 18.0, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold),
                     ),
                     Text(
                       'Are you sure to exit app?',
@@ -84,7 +114,8 @@ class HomePageState extends State<HomePage> {
                     ),
                     Text(
                       'CANCEL',
-                      style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          color: primaryColor, fontWeight: FontWeight.bold),
                     )
                   ],
                 ),
@@ -104,7 +135,8 @@ class HomePageState extends State<HomePage> {
                     ),
                     Text(
                       'YES',
-                      style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          color: primaryColor, fontWeight: FontWeight.bold),
                     )
                   ],
                 ),
@@ -179,14 +211,15 @@ class HomePageState extends State<HomePage> {
                 context,
                 MaterialPageRoute(
                     builder: (context) => Chat(
-                      peerId: document.documentID,
-                      peerAvatar: document['photoUrl'],
-                      peerName: document['nickname'],
-                    )));
+                          peerId: document.documentID,
+                          peerAvatar: document['photoUrl'],
+                          peerName: document['nickname'],
+                        )));
           },
           color: greyColor2,
           padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 10.0),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
         ),
         margin: EdgeInsets.only(bottom: 10.0, left: 5.0, right: 5.0),
       );
@@ -197,7 +230,8 @@ class HomePageState extends State<HomePage> {
     if (choice.title == 'Log out') {
       handleSignOut();
     } else {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => Settings()));
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => Settings()));
     }
   }
 
@@ -212,46 +246,131 @@ class HomePageState extends State<HomePage> {
       isLoading = false;
     });
 
-    Navigator.of(context)
-        .pushAndRemoveUntil(MaterialPageRoute(builder: (context) => MyApp()), (Route<dynamic> route) => false);
+    Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => MyApp()),
+        (Route<dynamic> route) => false);
+  }
+
+  Widget buildBar(BuildContext context) {
+    return new AppBar(centerTitle: true, title: appBarTitle, actions: <Widget>[
+      new IconButton(
+        icon: actionIcon,
+        onPressed: () {
+          setState(() {
+            if (this.actionIcon.icon == Icons.search) {
+              this.actionIcon = new Icon(
+                Icons.close,
+                color: Colors.white,
+              );
+              this.appBarTitle = new TextField(
+//                onChanged: _searchQuery,
+                controller: _searchQuery,
+                style: new TextStyle(
+                  color: Colors.white,
+                ),
+                decoration: new InputDecoration(
+                  hintText: "Search...",
+                  hintStyle: new TextStyle(color: Colors.white),
+                  prefixIcon: new Icon(Icons.search, color: Colors.white),
+                ),
+              );
+              _handleSearchStart();
+            } else {
+              _handleSearchEnd();
+            }
+          });
+        },
+      ),
+      PopupMenuButton<Choice>(
+        onSelected: onItemMenuPress,
+        itemBuilder: (BuildContext context) {
+          return choices.map((Choice choice) {
+            return PopupMenuItem<Choice>(
+                value: choice,
+                child: Row(
+                  children: <Widget>[
+                    Icon(
+                      choice.icon,
+                      color: primaryColor,
+                    ),
+                    Container(
+                      width: 10.0,
+                    ),
+                    Text(
+                      choice.title,
+                      style: TextStyle(color: primaryColor),
+                    ),
+                  ],
+                ));
+          }).toList();
+        },
+      ),
+    ]);
+  }
+
+  Widget appBarTitle = new Text(
+    "Search User",
+    style: new TextStyle(color: Colors.white),
+  );
+  Icon actionIcon = new Icon(
+    Icons.search,
+    color: Colors.white,
+  );
+  final key = new GlobalKey<ScaffoldState>();
+  final TextEditingController _searchQuery = new TextEditingController();
+
+  bool _IsSearching;
+  String _searchText = "";
+
+  void _handleSearchStart() {
+    setState(() {
+      _IsSearching = true;
+    });
+  }
+
+  void _handleSearchEnd() {
+    setState(() {
+      this.actionIcon = new Icon(
+        Icons.search,
+        color: Colors.white,
+      );
+      this.appBarTitle = new Text(
+        "Search User",
+        style: new TextStyle(color: Colors.white),
+      );
+      _IsSearching = false;
+      _searchQuery.clear();
+    });
+  }
+
+  List<int> itemSearch = new List();
+
+  DocumentSnapshot _buildSearchList(snapshot, index) {
+    if (!_searchText.isEmpty) {
+      for (int i = 0; i < snapshot.data.documents.length; i++) {
+        if (snapshot.data.documents[i]['nickname']
+            .toLowerCase()
+            .contains(_searchText.toLowerCase())) {
+          return _buildSearchIndexList(snapshot,i);
+        }
+      }
+    } else {
+      return _buildList(snapshot, index);
+    }
+  }
+
+  DocumentSnapshot _buildSearchIndexList(snapshot, index) {
+    return snapshot.data.documents[index];
+  }
+
+  DocumentSnapshot _buildList(snapshot, index) {
+    return snapshot.data.documents[index];
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'List User',
-          style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
-        actions: <Widget>[
-          PopupMenuButton<Choice>(
-            onSelected: onItemMenuPress,
-            itemBuilder: (BuildContext context) {
-              return choices.map((Choice choice) {
-                return PopupMenuItem<Choice>(
-                    value: choice,
-                    child: Row(
-                      children: <Widget>[
-                        Icon(
-                          choice.icon,
-                          color: primaryColor,
-                        ),
-                        Container(
-                          width: 10.0,
-                        ),
-                        Text(
-                          choice.title,
-                          style: TextStyle(color: primaryColor),
-                        ),
-                      ],
-                    ));
-              }).toList();
-            },
-          ),
-        ],
-      ),
+      appBar: buildBar(context),
       body: WillPopScope(
         child: Stack(
           children: <Widget>[
@@ -269,7 +388,11 @@ class HomePageState extends State<HomePage> {
                   } else {
                     return ListView.builder(
                       padding: EdgeInsets.all(10.0),
-                      itemBuilder: (context, index) => buildItem(context, snapshot.data.documents[index]),
+                      itemBuilder: (context, index) => buildItem(
+                          context,
+                          _IsSearching
+                              ? _buildSearchList(snapshot, index)
+                              : snapshot.data.documents[index]),
                       itemCount: snapshot.data.documents.length,
                     );
                   }
@@ -281,11 +404,13 @@ class HomePageState extends State<HomePage> {
             Positioned(
               child: isLoading
                   ? Container(
-                child: Center(
-                  child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(themeColor)),
-                ),
-                color: Colors.white.withOpacity(0.8),
-              )
+                      child: Center(
+                        child: CircularProgressIndicator(
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(themeColor)),
+                      ),
+                      color: Colors.white.withOpacity(0.8),
+                    )
                   : Container(),
             )
           ],
@@ -295,6 +420,7 @@ class HomePageState extends State<HomePage> {
     );
   }
 }
+
 class Choice {
   const Choice({this.title, this.icon});
 
