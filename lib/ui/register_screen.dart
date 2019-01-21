@@ -1,4 +1,5 @@
 import 'package:chat_firebase/firebase/auth_provider.dart';
+import 'package:chat_firebase/utils/conts.dart';
 import 'package:chat_firebase/views/stacked_icons.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -38,6 +39,7 @@ class _RegisterPageState extends State<RegisterPage> {
   String _email;
   String _password;
   String _confirm_password;
+  bool isLoading;
 
   bool validateAndSave() {
     final form = formKey.currentState;
@@ -48,11 +50,21 @@ class _RegisterPageState extends State<RegisterPage> {
     return false;
   }
 
+
+  @override
+  void initState() {
+    super.initState();
+    isLoading = false;
+  }
+
   void validateAndSubmit() async {
     prefs = await SharedPreferences.getInstance();
     if (validateAndSave()) {
       try {
         var auth = AuthProvider.of(context).auth;
+        setState(() {
+          isLoading = true;
+        });
         if(_password == _confirm_password){
           String userId =
           await auth.createUserWithEmailAndPassword(_email, _password);
@@ -65,12 +77,22 @@ class _RegisterPageState extends State<RegisterPage> {
           await prefs.setString('id', userId);
           await prefs.setString('nickname', _email);
           await prefs.setString('photoUrl', "http://file.vforum.vn/hinh/2018/03/hinh-anh-hinh-nen-songoku-dep-nhat-tu-nho-den-lon-3.jpg");
+          setState(() {
+            isLoading = false;
+          });
           moveToLogin();
           widget.onSignedIn();
         }
       } catch (e) {
         print('Error: $e');
+        setState(() {
+          isLoading = false;
+        });
       }
+    }else{
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -85,21 +107,28 @@ class _RegisterPageState extends State<RegisterPage> {
         appBar: AppBar(
           title: Text('Chat'),
         ),
-        body: SingleChildScrollView(
-          child: Column(
+        body: Center(
+          child: Stack(
             children: <Widget>[
-              new SizedBox(height: 20),
-              new StakedIcons(),
-              new Container(
-                margin: new EdgeInsets.only(left: 20, right: 20),
-                child: Form(
-                  key: formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: buildInputs() + buildSubmitButtons(),
-                  ),
+              SingleChildScrollView(
+                child: Column(
+                  children: <Widget>[
+                    SizedBox(height: 20),
+                    StakedIcons(),
+                    Container(
+                      margin: new EdgeInsets.only(left: 20, right: 20),
+                      child: Form(
+                        key: formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: buildInputs() + buildSubmitButtons(),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
+              buildLoading(),
             ],
           ),
         ));
@@ -141,5 +170,19 @@ class _RegisterPageState extends State<RegisterPage> {
         onPressed: moveToLogin,
       ),
     ];
+  }
+
+  Widget buildLoading() {
+    return Positioned(
+      child: isLoading
+          ? Container(
+        child: Center(
+          child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(themeColor)),
+        ),
+        color: Colors.white.withOpacity(0.8),
+      )
+          : Container(),
+    );
   }
 }
