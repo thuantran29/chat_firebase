@@ -126,18 +126,27 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   List<Widget> buildInputs() {
+    final FocusNode emailFocus = FocusNode();
+    final FocusNode passFocus = FocusNode();
+
     return [
       TextFormField(
         key: Key('email'),
         decoration: InputDecoration(labelText: 'Email'),
         validator: EmailFieldValidator.validate,
         onSaved: (value) => _email = value,
+        textInputAction: TextInputAction.next,
+        focusNode: emailFocus,
+        onFieldSubmitted: (term){
+          FocusScope.of(context).requestFocus(passFocus);
+        },
       ),
       TextFormField(
         key: Key('password'),
         decoration: InputDecoration(labelText: 'Password'),
         obscureText: true,
         validator: PasswordFieldValidator.validate,
+        focusNode: passFocus,
         onSaved: (value) => _password = value,
       ),
     ];
